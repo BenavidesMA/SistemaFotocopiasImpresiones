@@ -4,8 +4,13 @@
  */
 package Modelo;
 
+import BaseDatos.BaseDatos;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -87,4 +92,113 @@ public class SolicitanteRepo{
     public int cantidad() {
         return solicitantes.size();
     }
-}
+    
+    public boolean dbRegistrar(Solicitante s) {
+        if (s == null || !s.esValido()) {
+            JOptionPane.showMessageDialog(null,
+                "Datos inválidos:\n" + (s != null ? s.getMensajeValidacion() : "Objeto nulo"),
+                "Error de validación", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        String sqlVerificar = "SELECT COUNT(*) FROM dependencias WHERE nombre = ?";
+        try (PreparedStatement psVerif = BaseDatos.dbConnection.prepareStatement(sqlVerificar)) {
+            psVerif.setString(1, s.getNombreDependencia());
+            ResultSet rs = psVerif.executeQuery();
+            rs.next();
+            int cantidad = rs.getInt(1);
+            rs.close();
+
+            if (cantidad == 0) {
+                JOptionPane.showMessageDialog(null,
+                    "La dependencia '" + s.getNombreDependencia() + "' no existe en el sistema.\n"
+                    + "Por favor registre primero la dependencia o verifique el nombre ingresado.",
+                    "Dependencia no encontrada", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,
+                "Error al verificar dependencia:\n" + e.getMessage(),
+                "Error SQL", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        String sqlInsertar = "INSERT INTO solicitantes "
+            + "(extension, nombre, apellido, cargo, password, nombre_dependencia) "
+            + "VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sqlInsertar)) {
+            ps.setString(1, s.getExtension());
+            ps.setString(2, s.getNombre());
+            ps.setString(3, s.getApellido());
+            ps.setString(4, s.getCargo());
+            ps.setString(5, s.getPassword());
+            ps.setString(6, s.getNombreDependencia());
+            ps.executeUpdate();
+
+            JOptionPane.showMessageDialog(null,
+                "Solicitante '" + s.getNombre() + " " + s.getApellido() + "' registrado exitosamente.",
+                "Registro exitoso", JOptionPane.INFORMATION_MESSAGE);
+            return true;
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,
+                "Error al registrar solicitante:\n" + e.getMessage(),
+                "Error SQL", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
+
+    public ArrayList<Solicitante> dbConsultarBasicosTodos() {
+        ArrayList<Solicitante> lista = new ArrayList<>();
+        String sql = "SELECT * FROM solicitantes";
+        try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                lista.add(new Solicitante(
+                    rs.getString("nombre"),
+                    rs.getString("apellido"),
+                    rs.getString("extension"),
+                    rs.getString("cargo"),
+                    rs.getString("password"),
+                    rs.getString("nombre_dependencia")
+                ));
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,
+                "Error al consultar solicitantes:\n" + e.getMessage(),
+                "Error SQL", JOptionPane.ERROR_MESSAGE);
+        }
+        return lista;
+    }
+
+    public ArrayList<String> dbConsultarConDependencia() {
+        ArrayList<String> lista = new ArrayList<>();
+        String sql =
+            "SELECT s.extension, s.nombre, s.apellido, s.cargo, s.password, "
+            + "s.nombre_dependencia, d.centro_costo "
+            + "FROM solicitantes s "
+            + "INNER JOIN dependencias d ON s.nombre_dependencia = d.nombre";
+
+        try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                String fila =
+                    "Ext: "         + rs.getString("extension")          + " | "
+                    + "Nombre: "    + rs.getString("nombre")             + " "
+                    +                 rs.getString("apellido")           + " | "
+                    + "Cargo: "     + rs.getString("cargo")              + " | "
+                    + "Dep: "       + rs.getString("nombre_dependencia") + " | "
+                    + "CC: "        + rs.getString("centro_costo");
+                lista.add(fila);
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,
+                "Error al consultar solicitantes con dependencia:\n" + e.getMessage(),
+                "Error SQL", JOptionPane.ERROR_MESSAGE);
+        }
+        return lista;
+    }
+
+} 
