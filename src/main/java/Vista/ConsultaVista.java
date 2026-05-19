@@ -5,6 +5,7 @@
 package Vista;
 
 import Modelo.*;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 
@@ -85,7 +86,7 @@ public class ConsultaVista {
 
         try {
             int numOrden = Integer.parseInt(input.trim());
-            OrdenAutorizacion orden = ordenRepo.buscarPorNumero(numOrden);
+            ArrayList<String> orden = ordenRepo.dbConsultarPorNumOrden(numOrden);
 
             if (orden == null) {
                 mostrarError("No existe una orden con ese número.");
@@ -287,5 +288,9 @@ public class ConsultaVista {
                 "Error",
                 JOptionPane.ERROR_MESSAGE
         );
+    }
+
+    private void mostrarDetalleOrden(ArrayList<String> orden) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

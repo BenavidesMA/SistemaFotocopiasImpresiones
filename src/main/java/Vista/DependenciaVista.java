@@ -7,6 +7,7 @@ package Vista;
 import java.util.List;
 import javax.swing.JOptionPane;
 import Modelo.*;
+import java.util.ArrayList;
 
 /**
  *
@@ -75,25 +76,20 @@ public class DependenciaVista {
         String nombre = JOptionPane.showInputDialog(
                 null,
                 "Ingrese el nombre de la dependencia a buscar:",
-                "Buscar Dependencia", JOptionPane.QUESTION_MESSAGE
-        );
+                "Buscar Dependencia", JOptionPane.QUESTION_MESSAGE);
 
-        if (nombre == null) {
-            return;
-        }
+        if (nombre == null) return;
 
-        Dependencia dep = dependenciaRepo.buscarPorNombre(nombre.trim());
+        Dependencia dep = dependenciaRepo.dbConsultarPorNombre(nombre.trim());
 
         if (dep == null) {
-            error("No existe una dependencia con ese nombre.");
+            error("No existe una dependencia con el nombre: " + nombre);
             return;
         }
 
-        JOptionPane.showMessageDialog(
-                null,
+        JOptionPane.showMessageDialog(null,
                 "═══ DEPENDENCIA ENCONTRADA ═══\n\n" + dep.toString(),
-                "Dependencia", JOptionPane.INFORMATION_MESSAGE
-        );
+                "Dependencia", JOptionPane.INFORMATION_MESSAGE);
     }
 
     // ── Registrar (sin cambios) ────────────────────────────────────────────
@@ -133,7 +129,7 @@ public class DependenciaVista {
             return;
         }
 
-        if (dependenciaRepo.agregar(dep)) {
+        if (dependenciaRepo.dbRegistrar(dep)) {
             JOptionPane.showMessageDialog(null,
                     "✓ Dependencia registrada exitosamente.\n\n" + dep.toString(),
                     "Registro Exitoso", JOptionPane.INFORMATION_MESSAGE);
@@ -188,7 +184,7 @@ public class DependenciaVista {
         }
 
         // Aplicar cambio en el repo
-        Dependencia dep = dependenciaRepo.buscarPorNombre(seleccion);
+        Dependencia dep = dependenciaRepo.dbConsultarPorNombre(seleccion);
         dep.setCentroCosto(nuevoCentro.trim());   // asume setter en Dependencia
 
         JOptionPane.showMessageDialog(null,
@@ -198,7 +194,7 @@ public class DependenciaVista {
 
     // ── Eliminar (nuevo) ───────────────────────────────────────────────────
     private void eliminarDependencia() {
-        List<Dependencia> deps = dependenciaRepo.listarTodas();
+        List<Dependencia> deps = dependenciaRepo.dbConsultarTodas();
         if (deps.isEmpty()) {
             JOptionPane.showMessageDialog(null, "No hay dependencias registradas.",
                     "Eliminar Dependencia", JOptionPane.INFORMATION_MESSAGE);
@@ -227,7 +223,7 @@ public class DependenciaVista {
             return;
         }
 
-        if (dependenciaRepo.eliminar(seleccion)) {
+        if (dependenciaRepo.dbEliminar(seleccion)) {
             JOptionPane.showMessageDialog(null,
                     "✓ Dependencia eliminada exitosamente.",
                     "Eliminación Exitosa", JOptionPane.INFORMATION_MESSAGE);
@@ -236,36 +232,39 @@ public class DependenciaVista {
         }
     }
 
-    // ── Listar (sin cambios) ───────────────────────────────────────────────
     private void listarDependencias() {
-        List<Dependencia> deps = dependenciaRepo.listarTodas();
+   
+        ArrayList<Dependencia> deps = dependenciaRepo.dbConsultarTodas();
+
         if (deps.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No hay dependencias registradas.",
+            JOptionPane.showMessageDialog(null,
+                    "No hay dependencias registradas en la base de datos.",
                     "Dependencias", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        StringBuilder sb = new StringBuilder("═══ DEPENDENCIAS REGISTRADAS ═══\n");
+
+        StringBuilder sb = new StringBuilder("═══ DEPENDENCIAS EN BASE DE DATOS ═══\n");
         sb.append("Total: ").append(deps.size()).append("\n\n");
         for (Dependencia d : deps) {
             sb.append("• ").append(d.toString()).append("\n");
         }
+
         JOptionPane.showMessageDialog(null, sb.toString(),
                 "Dependencias", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // ── seleccionarDependencia (sin cambios, usada por SolicitanteVista) ──
+    
     public String seleccionarDependencia() {
-        List<Dependencia> deps = dependenciaRepo.listarTodas();
+        ArrayList<Dependencia> deps = dependenciaRepo.dbConsultarTodas();
         if (deps.isEmpty()) {
             JOptionPane.showMessageDialog(null,
                     "No hay dependencias registradas.\nDebe registrar al menos una dependencia primero.",
                     "Error", JOptionPane.ERROR_MESSAGE);
             return null;
         }
+
         String[] opciones = new String[deps.size()];
-        for (int i = 0; i < deps.size(); i++) {
-            opciones[i] = deps.get(i).getNombre();
-        }
+        for (int i = 0; i < deps.size(); i++) opciones[i] = deps.get(i).getNombre();
 
         return (String) JOptionPane.showInputDialog(null,
                 "Seleccione una dependencia:", "Seleccionar Dependencia",
