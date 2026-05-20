@@ -250,7 +250,7 @@ public class SolicitanteVista {
         }
 
         // Agregar
-        if (solicitanteRepo.agregar(sol)) {
+        if (solicitanteRepo.dbRegistrar(sol)) {
             JOptionPane.showMessageDialog(
                     null,
                     "✓ Solicitante registrado exitosamente.\n\n"
@@ -270,7 +270,7 @@ public class SolicitanteVista {
      * Lista todos los solicitantes registrados.
      */
     private void listarSolicitantes() {
-        List<Solicitante> sols = solicitanteRepo.listarTodos();
+        List<Solicitante> sols = solicitanteRepo.dbConsultarBasicosTodos();
 
         if (sols.isEmpty()) {
             JOptionPane.showMessageDialog(
