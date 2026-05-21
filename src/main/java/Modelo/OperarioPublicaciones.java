@@ -13,7 +13,7 @@ public class OperarioPublicaciones extends Solicitante {
     public OperarioPublicaciones(String nombre, String apellido, String extension,
                                   String cargo, String password, String nombreDependencia) {
         // Llama al constructor de Solicitante, que a su vez llama al de Persona
-        super(nombre, apellido, extension, cargo, password, nombreDependencia);
+        super(nombre, apellido, extension, cargo, nombreDependencia);
     }
  
     // ── Sobreescritura de métodos de Persona/Solicitante ────────────────────

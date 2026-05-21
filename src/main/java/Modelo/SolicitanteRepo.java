@@ -70,9 +70,9 @@ public class SolicitanteRepo{
      * @param password  contraseña.
      * @return el Solicitante autenticado, o null si las credenciales son incorrectas.
      */
-    public Solicitante autenticar(String extension, String password) {
+    public Solicitante autenticar(String extension) {
         Solicitante s = buscarPorExtension(extension);
-        if (s != null && s.getPassword().equals(password)) {
+        if (s != null && s.getExtension().equals(extension)) {
             return s;
         }
         return null;
@@ -124,15 +124,14 @@ public class SolicitanteRepo{
         }
 
         String sqlInsertar = "INSERT INTO solicitantes "
-            + "(extension, nombre, apellido, cargo, password, nombre_dependencia) "
+            + "(extension, nombre, apellido, cargo, nombre_dependencia) "
             + "VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sqlInsertar)) {
             ps.setString(1, s.getExtension());
             ps.setString(2, s.getNombre());
             ps.setString(3, s.getApellido());
             ps.setString(4, s.getCargo());
-            ps.setString(5, s.getPassword());
-            ps.setString(6, s.getNombreDependencia());
+            ps.setString(5, s.getNombreDependencia());
             ps.executeUpdate();
 
             JOptionPane.showMessageDialog(null,
@@ -159,7 +158,6 @@ public class SolicitanteRepo{
                     rs.getString("apellido"),
                     rs.getString("extension"),
                     rs.getString("cargo"),
-                    rs.getString("password"),
                     rs.getString("nombre_dependencia")
                 ));
             }

@@ -86,19 +86,19 @@ public class SistemaFotocopiasImpresiones {
     repo.agregar(new Solicitante(
         "María José", "Rodríguez Gómez",
         "00234", "Profesor Asociado",   // 17 ✓ sin cambio
-        "pass123", "Ingeniería de Sistemas"
+        "Ingeniería de Sistemas"
     ));
 
     repo.agregar(new Solicitante(
         "Carlos Alberto", "Méndez Torres",
         "01455", "Coordinador",          // 11 ✓ (antes: "Coordinador Académico")
-        "pass456", "Ciencias Básicas"
+        "Ciencias Básicas"
     ));
 
     repo.agregar(new Solicitante(
         "Ana Patricia", "Vargas Castro",
         "02876", "Asist. Administrativo", // 20 ✓ (antes: "Asistente Administrativo")
-        "pass789", "Administración"
+        "Administración"
     ));
 
     repo.agregar(new OperarioPublicaciones(
