@@ -31,7 +31,7 @@ public class ConsultaVista {
                     null,
                     "═══ CONSULTAR ÓRDENES ═══\n\n"
                     + "1. Buscar por Número de Orden\n"
-                    + "2. Ver Mis Órdenes\n"
+                    + "2. Ver Órdenes\n"
                     + "3. Ver Todas las Órdenes (resumen)\n"
                     + "4. Volver\n\n"
                     + "Elija una opción:",

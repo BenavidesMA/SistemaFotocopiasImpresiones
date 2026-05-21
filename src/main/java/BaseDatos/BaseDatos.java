@@ -34,8 +34,8 @@ public class BaseDatos {
 
             // URL de conexión
             String sourceURL = "jdbc:mysql://localhost:3306/"
-                    + nameDB
-                    + "?useSSL=false&serverTimezone=UTC";
+                    + nameDB;
+                    //"?useSSL=false&serverTimezone=UTC";
 
             // Conectar
             dbConnection = DriverManager.getConnection(sourceURL, user, pwd);

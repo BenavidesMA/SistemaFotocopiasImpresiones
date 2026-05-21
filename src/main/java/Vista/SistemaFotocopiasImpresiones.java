@@ -14,6 +14,15 @@ import Modelo.*;
 public class SistemaFotocopiasImpresiones {
  
     public static void main(String[] args) {
+        
+    BaseDatos objBaseDatos = new BaseDatos();
+    boolean conexion = objBaseDatos.crearConexion();
+    if (!conexion) {
+        JOptionPane.showMessageDialog(null,
+            "No se pudo conectar a la base de datos. El sistema se cerrará.",
+            "Error crítico", JOptionPane.ERROR_MESSAGE);
+        return; // no tiene sentido continuar sin BD
+    }
 
     // ── Repos se crean UNA sola vez, persisten durante toda la sesión ──
     DependenciaRepo dependenciaRepo = new DependenciaRepo();
@@ -29,7 +38,6 @@ public class SistemaFotocopiasImpresiones {
 
     LoginVista loginVista = new LoginVista(solicitanteRepo);
     
-   
     // ── Ciclo principal: vuelve al login cada vez que alguien cierra sesión ──
     while (true) {
         Solicitante usuarioActual = loginVista.mostrarLogin();

@@ -10,6 +10,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.JOptionPane;
 import Modelo.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,8 +41,9 @@ public class SolicitanteVista {
                     "═══ GESTIÓN DE SOLICITANTES ═══\n\n"
                     + "1. Registrar Nuevo Solicitante\n"
                     + "2. Listar Solicitantes (datos básicos)\n"
-                    + "3. Listar Solicitantes (con dependencia)\n" // NUEVA
-                    + "4. Volver al Menú Principal\n\n"
+                    + "3. Listar Solicitantes (con dependencia)\n"
+                    + "4. Consultar Solicitante por Nombre\n" // NUEVA
+                    + "5. Volver al Menú Principal\n\n"
                     + "Elija una opción:",
                     "Solicitantes - UAO", JOptionPane.QUESTION_MESSAGE
             );
@@ -66,63 +68,31 @@ public class SolicitanteVista {
                     listarSolicitantesCompleto();
                     break;  // NUEVA
                 case 4:
+                    consultarSolicitantePorNombre();
+                    break;
+                case 5:
                     break;
                 default:
                     JOptionPane.showMessageDialog(null, "Opción inválida.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     break;
             }
-        } while (opcion != 4);
+        } while (opcion != 5);
     }
 
 // MÉTODO NUEVO — equivalente a SELECT con INNER JOIN sobre dependencia
     private void listarSolicitantesCompleto() {
-    List<Solicitante> sols = solicitanteRepo.listarTodos();
+        ArrayList<String> sols = solicitanteRepo.dbConsultarConDependencia();
 
-    if (sols.isEmpty()) {
-        JOptionPane.showMessageDialog(null, "No hay solicitantes registrados.",
-            "Solicitantes", JOptionPane.INFORMATION_MESSAGE);
-        return;
-    }
-
-    StringBuilder sb = new StringBuilder();
-    sb.append("═══ SOLICITANTES CON DEPENDENCIA ═══\n");
-    sb.append("Total: ").append(sols.size()).append("\n\n");
-
-    for (Solicitante s : sols) {
-        sb.append("────────────────────────────────\n");
-        sb.append("Solicitante: ").append(s.getNombre()).append(" ")
-          .append(s.getApellido()).append("\n");
-        sb.append("Extensión:   ").append(s.getExtension()).append("\n");
-        sb.append("Cargo:       ").append(s.getCargo()).append("\n");
-        sb.append("Rol:         ").append(s.getTipoUsuario().getDescripcion()).append("\n");
-
-        Dependencia dep = dependenciaRepo.buscarPorNombre(s.getNombreDependencia());
-        if (dep != null) {
-            sb.append("── Dependencia ──\n");
-            sb.append("  Nombre:       ").append(dep.getNombre()).append("\n");
-            sb.append("  Centro costo: ").append(dep.getCentroCosto()).append("\n");
-        } else {
-            sb.append("  [Dependencia no encontrada]\n");
+        if (sols.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No hay solicitantes registrados.",
+                    "Solicitantes", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
-        sb.append("\n");
+
+        JOptionPane.showMessageDialog(null, sols);
+
     }
-
-    // ── Componente con scroll ──────────────────────────────────────────────
-    JTextArea textArea = new JTextArea(sb.toString());
-    textArea.setEditable(false);
-    textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-
-    JScrollPane scrollPane = new JScrollPane(textArea);
-    scrollPane.setPreferredSize(new Dimension(480, 400)); // ancho x alto visible
-
-    JOptionPane.showMessageDialog(
-        null,
-        scrollPane,
-        "Solicitantes con Dependencia",
-        JOptionPane.INFORMATION_MESSAGE
-    );
-}
 
     /**
      * Registra un nuevo solicitante (usuario del sistema).
@@ -203,7 +173,7 @@ public class SolicitanteVista {
             mostrarError("El cargo no puede estar vacío.");
             return;
         }
-   
+
         // 5. Seleccionar dependencia
         String nombreDependencia = dependenciaVista.seleccionarDependencia();
         if (nombreDependencia == null) {
@@ -236,7 +206,7 @@ public class SolicitanteVista {
                     "✓ Solicitante registrado exitosamente.\n\n"
                     + sol.toString() + "\n\n"
                     + "Puede iniciar sesión con:\n"
-                    + "Extesión: " + extension + "\n", 
+                    + "Extesión: " + extension + "\n",
                     "Registro Exitoso",
                     JOptionPane.INFORMATION_MESSAGE
             );
@@ -275,6 +245,41 @@ public class SolicitanteVista {
                 "Solicitantes",
                 JOptionPane.INFORMATION_MESSAGE
         );
+    }
+
+    private void consultarSolicitantePorNombre() {
+        String nombre = JOptionPane.showInputDialog(null,
+                "Ingrese el nombre del solicitante:",
+                "Consultar Solicitante", JOptionPane.QUESTION_MESSAGE);
+        if (nombre == null) {
+            return;
+        }
+
+        String apellido = JOptionPane.showInputDialog(null,
+                "Ingrese el apellido del solicitante:",
+                "Consultar Solicitante", JOptionPane.QUESTION_MESSAGE);
+        if (apellido == null) {
+            return;
+        }
+
+        Solicitante s = solicitanteRepo.dbConsultarPorNombre(nombre, apellido);
+
+        if (s == null) {
+            JOptionPane.showMessageDialog(null,
+                    "No se encontró ningún solicitante con ese nombre y apellido.",
+                    "Sin resultados", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String info
+                = "Nombre:      " + s.getNombre() + "\n" 
+                + "Apellido:    " + s.getApellido() + "\n"
+                + "Extensión:   " + s.getExtension() + "\n"
+                + "Cargo:       " + s.getCargo() + "\n"
+                + "Dependencia: " + s.getNombreDependencia();
+
+        JOptionPane.showMessageDialog(null, info,
+                "Datos del Solicitante", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**

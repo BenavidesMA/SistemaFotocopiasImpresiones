@@ -16,17 +16,18 @@ import javax.swing.JOptionPane;
  *
  * @author Miguel
  */
-public class SolicitanteRepo{
- 
+public class SolicitanteRepo {
+
     private List<Solicitante> solicitantes;
- 
+
     public SolicitanteRepo() {
         this.solicitantes = new ArrayList<>();
     }
- 
+
     /**
-     * Agrega un solicitante al repositorio si no existe ya.
-     * POLIMORFISMO: puede recibir un Solicitante o un OperarioPublicaciones.
+     * Agrega un solicitante al repositorio si no existe ya. POLIMORFISMO: puede
+     * recibir un Solicitante o un OperarioPublicaciones.
+     *
      * @return true si se agregó, false si ya existía o no es válido.
      */
     public boolean agregar(Solicitante s) {
@@ -38,66 +39,106 @@ public class SolicitanteRepo{
         }
         return solicitantes.add(s);
     }
- 
+
     /**
-     * Busca un solicitante por su extensión (PK).
-     * POLIMORFISMO: puede retornar un Solicitante o un OperarioPublicaciones.
+     * Busca un solicitante por su extensión (PK). POLIMORFISMO: puede retornar
+     * un Solicitante o un OperarioPublicaciones.
+     *
      * @return el Solicitante encontrado, o null si no existe.
      */
-    public Solicitante buscarPorExtension(String extension) {
-        if (extension == null) return null;
+    public Solicitante buscarPorExtensionBD(String extension) {
+        if (extension == null) {
+            return null;
+        }
+        String sql = "SELECT nombre, apellido, extension, cargo, nombre_dependencia "
+                + "FROM solicitantes WHERE extension = ?";
+        try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql)) {
+            ps.setString(1, extension.trim());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Solicitante s = new Solicitante(
+                        rs.getString("nombre"),
+                        rs.getString("apellido"),
+                        rs.getString("extension"),
+                        rs.getString("cargo"),
+                        rs.getString("nombre_dependencia")
+                );
+                rs.close();
+                return s;
+            }
+            rs.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,
+                    "Error al buscar solicitante:\n" + e.getMessage(),
+                    "Error SQL", JOptionPane.ERROR_MESSAGE);
+        }
+        return null;
+    }
+
+// Busca operarios en la lista local (solo OperarioPublicaciones)
+    public Solicitante buscarOperarioPorExtension(String extension) {
+        if (extension == null) {
+            return null;
+        }
         for (Solicitante s : solicitantes) {
-            if (s.getExtension().equals(extension.trim())) {
+            if (s instanceof OperarioPublicaciones
+                    && s.getExtension().equals(extension.trim())) {
                 return s;
             }
         }
         return null;
     }
- 
-    /**
-     * Verifica si existe un solicitante con esa extensión.
-     */
+
     public boolean existe(String extension) {
-        return buscarPorExtension(extension) != null;
+        return buscarPorExtensionBD(extension) != null
+                || buscarOperarioPorExtension(extension) != null;
     }
- 
+
     /**
-     * Autentica un usuario por extensión y contraseña.
-     * POLIMORFISMO: retorna un Solicitante que puede ser en realidad un OperarioPublicaciones.
-     * El llamador puede verificar getTipoUsuario() para saber el rol real.
+     * Autentica un usuario por extensión y contraseña. POLIMORFISMO: retorna un
+     * Solicitante que puede ser en realidad un OperarioPublicaciones. El
+     * llamador puede verificar getTipoUsuario() para saber el rol real.
      *
      * @param extension extensión telefónica (usuario).
-     * @param password  contraseña.
-     * @return el Solicitante autenticado, o null si las credenciales son incorrectas.
+     * @param password contraseña.
+     * @return el Solicitante autenticado, o null si las credenciales son
+     * incorrectas.
      */
     public Solicitante autenticar(String extension) {
-        Solicitante s = buscarPorExtension(extension);
-        if (s != null && s.getExtension().equals(extension)) {
+        if (extension == null) {
+            return null;
+        }
+
+        // 1. Buscar primero en la BD (solicitantes normales)
+        Solicitante s = buscarPorExtensionBD(extension);
+        if (s != null) {
             return s;
         }
-        return null;
+
+        // 2. Si no está en BD, buscar en lista local (solo operarios)
+        return buscarOperarioPorExtension(extension);
     }
- 
+
     /**
-     * Retorna todos los solicitantes registrados.
-     * POLIMORFISMO: la lista contiene objetos Solicitante y OperarioPublicaciones.
+     * Retorna todos los solicitantes registrados. POLIMORFISMO: la lista
+     * contiene objetos Solicitante y OperarioPublicaciones.
      */
     public List<Solicitante> listarTodos() {
         return new ArrayList<>(solicitantes);
     }
- 
+
     /**
      * Retorna la cantidad de solicitantes registrados.
      */
     public int cantidad() {
         return solicitantes.size();
     }
-    
+
     public boolean dbRegistrar(Solicitante s) {
         if (s == null || !s.esValido()) {
             JOptionPane.showMessageDialog(null,
-                "Datos inválidos:\n" + (s != null ? s.getMensajeValidacion() : "Objeto nulo"),
-                "Error de validación", JOptionPane.ERROR_MESSAGE);
+                    "Datos inválidos:\n" + (s != null ? s.getMensajeValidacion() : "Objeto nulo"),
+                    "Error de validación", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
@@ -111,38 +152,38 @@ public class SolicitanteRepo{
 
             if (cantidad == 0) {
                 JOptionPane.showMessageDialog(null,
-                    "La dependencia '" + s.getNombreDependencia() + "' no existe en el sistema.\n"
-                    + "Por favor registre primero la dependencia o verifique el nombre ingresado.",
-                    "Dependencia no encontrada", JOptionPane.WARNING_MESSAGE);
+                        "La dependencia '" + s.getNombreDependencia() + "' no existe en el sistema.\n"
+                        + "Por favor registre primero la dependencia o verifique el nombre ingresado.",
+                        "Dependencia no encontrada", JOptionPane.WARNING_MESSAGE);
                 return false;
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,
-                "Error al verificar dependencia:\n" + e.getMessage(),
-                "Error SQL", JOptionPane.ERROR_MESSAGE);
+                    "Error al verificar dependencia:\n" + e.getMessage(),
+                    "Error SQL", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
         String sqlInsertar = "INSERT INTO solicitantes "
-            + "(extension, nombre, apellido, cargo, nombre_dependencia) "
-            + "VALUES (?, ?, ?, ?, ?, ?)";
+                + "(nombre, apellido, extension, cargo, nombre_dependencia) "
+                + "VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sqlInsertar)) {
-            ps.setString(1, s.getExtension());
-            ps.setString(2, s.getNombre());
-            ps.setString(3, s.getApellido());
+            ps.setString(1, s.getNombre());
+            ps.setString(2, s.getApellido());
+            ps.setString(3, s.getExtension());
             ps.setString(4, s.getCargo());
             ps.setString(5, s.getNombreDependencia());
             ps.executeUpdate();
 
             JOptionPane.showMessageDialog(null,
-                "Solicitante '" + s.getNombre() + " " + s.getApellido() + "' registrado exitosamente.",
-                "Registro exitoso", JOptionPane.INFORMATION_MESSAGE);
+                    "Solicitante '" + s.getNombre() + " " + s.getApellido() + "' registrado exitosamente.",
+                    "Registro exitoso", JOptionPane.INFORMATION_MESSAGE);
             return true;
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,
-                "Error al registrar solicitante:\n" + e.getMessage(),
-                "Error SQL", JOptionPane.ERROR_MESSAGE);
+                    "Error al registrar solicitante:\n" + e.getMessage(),
+                    "Error SQL", JOptionPane.ERROR_MESSAGE);
             return false;
         }
     }
@@ -150,53 +191,77 @@ public class SolicitanteRepo{
     public ArrayList<Solicitante> dbConsultarBasicosTodos() {
         ArrayList<Solicitante> lista = new ArrayList<>();
         String sql = "SELECT * FROM solicitantes";
-        try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 lista.add(new Solicitante(
-                    rs.getString("nombre"),
-                    rs.getString("apellido"),
-                    rs.getString("extension"),
-                    rs.getString("cargo"),
-                    rs.getString("nombre_dependencia")
+                        rs.getString("nombre"),
+                        rs.getString("apellido"),
+                        rs.getString("extension"),
+                        rs.getString("cargo"),
+                        rs.getString("nombre_dependencia")
                 ));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,
-                "Error al consultar solicitantes:\n" + e.getMessage(),
-                "Error SQL", JOptionPane.ERROR_MESSAGE);
+                    "Error al consultar solicitantes:\n" + e.getMessage(),
+                    "Error SQL", JOptionPane.ERROR_MESSAGE);
         }
         return lista;
     }
 
     public ArrayList<String> dbConsultarConDependencia() {
         ArrayList<String> lista = new ArrayList<>();
-        String sql =
-            "SELECT s.extension, s.nombre, s.apellido, s.cargo, s.password, "
-            + "s.nombre_dependencia, d.centro_costo "
-            + "FROM solicitantes s "
-            + "INNER JOIN dependencias d ON s.nombre_dependencia = d.nombre";
+        String sql
+                = "SELECT s.extension, s.nombre, s.apellido, s.cargo,"
+                + "s.nombre_dependencia, d.centro_costo "
+                + "FROM solicitantes s "
+                + "INNER JOIN dependencias d ON s.nombre_dependencia = d.nombre";
 
-        try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                String fila =
-                    "Ext: "         + rs.getString("extension")          + " | "
-                    + "Nombre: "    + rs.getString("nombre")             + " "
-                    +                 rs.getString("apellido")           + " | "
-                    + "Cargo: "     + rs.getString("cargo")              + " | "
-                    + "Dep: "       + rs.getString("nombre_dependencia") + " | "
-                    + "CC: "        + rs.getString("centro_costo");
+                String fila
+                        = "Ext: " + rs.getString("extension") + " | "
+                        + "Nombre: " + rs.getString("nombre") + " "
+                        + rs.getString("apellido") + " | "
+                        + "Cargo: " + rs.getString("cargo") + " | "
+                        + "Dep: " + rs.getString("nombre_dependencia") + " | "
+                        + "CC: " + rs.getString("centro_costo");
                 lista.add(fila);
             }
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,
-                "Error al consultar solicitantes con dependencia:\n" + e.getMessage(),
-                "Error SQL", JOptionPane.ERROR_MESSAGE);
+                    "Error al consultar solicitantes con dependencia:\n" + e.getMessage(),
+                    "Error SQL", JOptionPane.ERROR_MESSAGE);
         }
         return lista;
     }
 
-} 
+    public Solicitante dbConsultarPorNombre(String nombre, String apellido) {
+    String sql = "SELECT nombre, apellido, extension, cargo, nombre_dependencia "
+               + "FROM solicitantes WHERE nombre = ? AND apellido = ?";
+    try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql)) {
+        ps.setString(1, nombre.trim());
+        ps.setString(2, apellido.trim());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            Solicitante s = new Solicitante(
+                rs.getString("nombre"),
+                rs.getString("apellido"),
+                rs.getString("extension"),
+                rs.getString("cargo"),
+                rs.getString("nombre_dependencia")
+            );
+            rs.close();
+            return s;
+        }
+        rs.close();
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null,
+            "Error al consultar solicitante:\n" + e.getMessage(),
+            "Error SQL", JOptionPane.ERROR_MESSAGE);
+    }
+    return null;
+}
+}

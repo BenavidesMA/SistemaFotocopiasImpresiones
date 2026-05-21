@@ -88,6 +88,6 @@ public class Solicitante extends Persona implements Validable {
     /** SOBREESCRITURA de toString() de Persona, añade la extensión. */
     @Override
     public String toString() {
-        return nombre + " " + apellido + " | Ext: " + extension + " | " + nombreDependencia;
+        return nombre + " " + apellido + " | Cargo: " + cargo + " | Ext: " + extension + " | " + nombreDependencia;
     }
 }

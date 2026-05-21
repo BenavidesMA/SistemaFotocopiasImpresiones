@@ -65,8 +65,8 @@ public class OrdenAutorizacion implements Validable {
         if (tipoOrden == null)
             errores.append("- Debe seleccionar un tipo de orden (Fotocopias o Impresiones).\n");
  
-        if (fechaSolicitud == null || !fechaSolicitud.matches("\\d{2}-\\d{2}-\\d{4}"))
-            errores.append("- Fecha de solicitud debe tener formato dd-mm-aaaa (ej: 09-05-2026).\n");
+        if (fechaSolicitud == null || !fechaSolicitud.matches("\\d{4}-\\d{2}-\\d{2}"))
+            errores.append("- Fecha de solicitud debe tener formato dd-mm-aaaa (ej: 2026-03-22).\n");
  
         if (observaciones != null && !observaciones.trim().isEmpty()) {
             if (observaciones.trim().length() < 10 || observaciones.trim().length() > 250)

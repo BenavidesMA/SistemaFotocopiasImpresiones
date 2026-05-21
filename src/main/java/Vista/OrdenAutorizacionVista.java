@@ -97,15 +97,15 @@ public class OrdenAutorizacionVista {
         String fecha = JOptionPane.showInputDialog(
             null,
             "Tipo: " + tipoOrden.getDescripcion() + "\n\n"
-          + "Ingrese la fecha de solicitud (dd-mm-aaaa):\n"
-          + "Ejemplo: 10-05-2026",
+          + "Ingrese la fecha de solicitud (aaaa-mm-dd):\n"
+          + "Ejemplo: 2026-02-21",
             "Fecha de Solicitud",
             JOptionPane.QUESTION_MESSAGE
         );
  
         if (fecha == null) return null;
-        if (!fecha.matches("\\d{2}-\\d{2}-\\d{4}")) {
-            mostrarError("Formato de fecha inválido. Use dd-mm-aaaa");
+        if (!fecha.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            mostrarError("Formato de fecha inválido. Use aaaa-mm-dd");
             return null;
         }
  
