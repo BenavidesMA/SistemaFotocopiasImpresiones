@@ -203,27 +203,8 @@ public class SolicitanteVista {
             mostrarError("El cargo no puede estar vacío.");
             return;
         }
-
-        // 5. Solicitar contraseña
-        String password = JOptionPane.showInputDialog(
-                null,
-                "Nombre: " + nombre + " " + apellido + "\n"
-                + "Extensión: " + extension + "\n"
-                + "Cargo: " + cargo + "\n\n"
-                + "Ingrese una contraseña:",
-                "Registrar Solicitante",
-                JOptionPane.QUESTION_MESSAGE
-        );
-
-        if (password == null) {
-            return;
-        }
-        if (password.trim().isEmpty()) {
-            mostrarError("La contraseña no puede estar vacía.");
-            return;
-        }
-
-        // 6. Seleccionar dependencia
+   
+        // 5. Seleccionar dependencia
         String nombreDependencia = dependenciaVista.seleccionarDependencia();
         if (nombreDependencia == null) {
             return;
@@ -235,8 +216,7 @@ public class SolicitanteVista {
                 apellido.trim(),
                 extension.trim(),
                 cargo.trim(),
-                password,
-                nombreDependencia
+                nombreDependencia.trim()
         );
 
         if (!sol.esValido()) {
@@ -256,8 +236,7 @@ public class SolicitanteVista {
                     "✓ Solicitante registrado exitosamente.\n\n"
                     + sol.toString() + "\n\n"
                     + "Puede iniciar sesión con:\n"
-                    + "Usuario: " + extension + "\n"
-                    + "Contraseña: [la que acaba de crear]",
+                    + "Extesión: " + extension + "\n", 
                     "Registro Exitoso",
                     JOptionPane.INFORMATION_MESSAGE
             );

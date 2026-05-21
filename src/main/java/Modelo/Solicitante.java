@@ -14,8 +14,8 @@ public class Solicitante extends Persona implements Validable {
     private String nombreDependencia;  // FK a Dependencia
  
     public Solicitante(String nombre, String apellido, String extension,
-                       String cargo, String password, String nombreDependencia) {
-        super(nombre, apellido, cargo, password);
+                       String cargo, String nombreDependencia) {
+        super(nombre, apellido, cargo, nombreDependencia);
         this.extension         = extension;
         this.nombreDependencia = nombreDependencia;
     }
@@ -70,9 +70,6 @@ public class Solicitante extends Persona implements Validable {
  
         if (cargo == null || cargo.trim().length() < 7 || cargo.trim().length() > 20)
             errores.append("- Cargo debe tener entre 7 y 20 caracteres.\n");
- 
-        if (password == null || password.trim().isEmpty())
-            errores.append("- La contraseña no puede estar vacía.\n");
  
         if (nombreDependencia == null || nombreDependencia.trim().isEmpty())
             errores.append("- Debe seleccionar una dependencia válida.\n");

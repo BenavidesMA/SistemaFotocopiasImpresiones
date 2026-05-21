@@ -92,26 +92,7 @@ public class LoginVista {
                 continue;
             }
 
-            String password = JOptionPane.showInputDialog(
-                    null,
-                    "Extensión: " + extension + "\n\nIngrese su contraseña:",
-                    "Login - UAO",
-                    JOptionPane.QUESTION_MESSAGE
-            );
-
-            if (password == null) {
-                return null;
-            }
-
-            if (password.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(null,
-                        "La contraseña no puede estar vacía.",
-                        "Error de Login", JOptionPane.ERROR_MESSAGE);
-                intentos++;
-                continue;
-            }
-
-            Solicitante usuario = solicitanteRepo.autenticar(extension.trim(), password);
+            Solicitante usuario = solicitanteRepo.autenticar(extension.trim());
 
             if (usuario != null) {
                 // Verificar que el tipo coincida con la opción elegida
@@ -142,7 +123,7 @@ public class LoginVista {
                 int restantes = MAX_INTENTOS - intentos;
                 if (restantes > 0) {
                     JOptionPane.showMessageDialog(null,
-                            "Extensión o contraseña incorrecta.\n\nIntentos restantes: " + restantes,
+                            "Extensión incorrecta.\n\nIntentos restantes: " + restantes,
                             "Error de Login", JOptionPane.ERROR_MESSAGE);
                 }
             }
