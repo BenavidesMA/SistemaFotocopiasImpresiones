@@ -59,6 +59,7 @@ public class OrdenAutorizacionVista {
         // Guardar orden
         if (ordenRepo.agregar(orden)) {
             ordenRepo.dbRegistrarOrden(orden);
+            ordenRepo.dbRegistrarServicios(orden);
             JOptionPane.showMessageDialog(
                 null,
                 "✓ Orden creada exitosamente.\n\n"

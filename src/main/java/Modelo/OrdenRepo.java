@@ -223,5 +223,26 @@ public class OrdenRepo{
         }
         return lista;
     }
+    
+    public void dbRegistrarServicios(OrdenAutorizacion o) {
+    if (o == null || o.getServicios().isEmpty()) return;
+
+    String sql = "INSERT INTO servicios (num_orden, tipo_servicio) VALUES (?, ?)";
+
+    try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql)) {
+        // Recorre cada servicio que el usuario seleccionó y lo inserta
+        for (Servicio s : o.getServicios()) {
+            ps.setInt   (1, o.getNumOrden());
+            ps.setString(2, s.getServicioSeleccionado().getDescripcion());
+            ps.addBatch(); // agrupa todos los INSERT en una sola operación
+        }
+        ps.executeBatch(); // ejecuta todos de una vez
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null,
+            "Error al registrar servicios:\n" + e.getMessage(),
+            "Error SQL", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
 }
