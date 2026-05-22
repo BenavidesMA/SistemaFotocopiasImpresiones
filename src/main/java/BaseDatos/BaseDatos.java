@@ -41,7 +41,7 @@ public class BaseDatos {
             dbConnection = DriverManager.getConnection(sourceURL, user, pwd);
 
             JOptionPane.showMessageDialog(null,
-                    "¡¡ Conexión establecida exitosamente !!");
+                    "¡¡ Conexión exitosa con el sistema !!");
 
         } catch (ClassNotFoundException | SQLException evt) {
 

@@ -143,7 +143,7 @@ public class ConsultaVista {
         StringBuilder sb = new StringBuilder();
         sb.append("═══ DETALLE DE ORDEN ═══\n\n");
         for (String fila : orden) {
-            // Cada campo en su propia línea para mejor legibilidad
+
             String[] partes = fila.split(" \\| ");
             for (String parte : partes) {
                 sb.append(parte).append("\n");

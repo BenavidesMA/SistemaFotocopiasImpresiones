@@ -9,18 +9,23 @@ package Modelo;
  * @author Miguel
  */
 public class Servicio {
- 
-    private int          numOrden;
+
+    private int numOrden;
     private TipoServicio servicioSeleccionado;
- 
+
     public Servicio(int numOrden, TipoServicio servicioSeleccionado) {
-        this.numOrden             = numOrden;
+        this.numOrden = numOrden;
         this.servicioSeleccionado = servicioSeleccionado;
     }
- 
-    public int          getNumOrden()              { return numOrden; }
-    public TipoServicio getServicioSeleccionado()  { return servicioSeleccionado; }
- 
+
+    public int getNumOrden() {
+        return numOrden;
+    }
+
+    public TipoServicio getServicioSeleccionado() {
+        return servicioSeleccionado;
+    }
+
     @Override
     public String toString() {
         return servicioSeleccionado.getDescripcion();

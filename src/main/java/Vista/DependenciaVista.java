@@ -29,7 +29,7 @@ public class DependenciaVista {
                     "═══ GESTIÓN DE DEPENDENCIAS ═══\n\n"
                     + "1. Registrar Nueva Dependencia\n"
                     + "2. Listar Todas las Dependencias\n"
-                    + "3. Buscar Dependencia por Nombre\n" // NUEVA
+                    + "3. Buscar Dependencia por Nombre\n"
                     + "4. Modificar Dependencia\n"
                     + "5. Eliminar Dependencia\n"
                     + "6. Volver al Menú Principal\n\n"
@@ -55,7 +55,7 @@ public class DependenciaVista {
                     break;
                 case 3:
                     buscarDependencia();
-                    break;  // NUEVA
+                    break;
                 case 4:
                     modificarDependencia();
                     break;
@@ -71,14 +71,15 @@ public class DependenciaVista {
         } while (opcion != 6);
     }
 
-// MÉTODO NUEVO
     private void buscarDependencia() {
         String nombre = JOptionPane.showInputDialog(
                 null,
                 "Ingrese el nombre de la dependencia a buscar:",
                 "Buscar Dependencia", JOptionPane.QUESTION_MESSAGE);
 
-        if (nombre == null) return;
+        if (nombre == null) {
+            return;
+        }
 
         Dependencia dep = dependenciaRepo.dbConsultarPorNombre(nombre.trim());
 
@@ -92,7 +93,6 @@ public class DependenciaVista {
                 "Dependencia", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // ── Registrar (sin cambios) ────────────────────────────────────────────
     private void registrarDependencia() {
         String nombre = JOptionPane.showInputDialog(null,
                 "═══ REGISTRAR DEPENDENCIA ═══\n\n"
@@ -138,7 +138,6 @@ public class DependenciaVista {
         }
     }
 
-    // ── Modificar (nuevo) ──────────────────────────────────────────────────
     private void modificarDependencia() {
         List<Dependencia> deps = dependenciaRepo.listarTodas();
         if (deps.isEmpty()) {
@@ -147,7 +146,6 @@ public class DependenciaVista {
             return;
         }
 
-        // Seleccionar cuál modificar
         String[] opciones = new String[deps.size()];
         for (int i = 0; i < deps.size(); i++) {
             opciones[i] = deps.get(i).getNombre();
@@ -162,7 +160,6 @@ public class DependenciaVista {
             return;
         }
 
-        // Solicitar nuevo centro de costo
         String nuevoCentro = JOptionPane.showInputDialog(null,
                 "Dependencia: " + seleccion + "\n\n"
                 + "Ingrese el nuevo centro de costo (3-12 caracteres):",
@@ -176,23 +173,20 @@ public class DependenciaVista {
             return;
         }
 
-        // Validar con objeto temporal
         Dependencia temp = new Dependencia(seleccion, nuevoCentro.trim());
         if (!temp.esValido()) {
             error("Datos inválidos:\n\n" + temp.getMensajeValidacion());
             return;
         }
 
-        // Aplicar cambio en el repo
         Dependencia dep = dependenciaRepo.dbConsultarPorNombre(seleccion);
-        dep.setCentroCosto(nuevoCentro.trim());   // asume setter en Dependencia
+        dep.setCentroCosto(nuevoCentro.trim());
 
         JOptionPane.showMessageDialog(null,
                 "✓ Dependencia actualizada exitosamente.\n\n" + dep.toString(),
                 "Modificación Exitosa", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // ── Eliminar (nuevo) ───────────────────────────────────────────────────
     private void eliminarDependencia() {
         List<Dependencia> deps = dependenciaRepo.dbConsultarTodas();
         if (deps.isEmpty()) {
@@ -233,7 +227,7 @@ public class DependenciaVista {
     }
 
     private void listarDependencias() {
-   
+
         ArrayList<Dependencia> deps = dependenciaRepo.dbConsultarTodas();
 
         if (deps.isEmpty()) {
@@ -253,7 +247,6 @@ public class DependenciaVista {
                 "Dependencias", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    
     public String seleccionarDependencia() {
         ArrayList<Dependencia> deps = dependenciaRepo.dbConsultarTodas();
         if (deps.isEmpty()) {
@@ -264,7 +257,9 @@ public class DependenciaVista {
         }
 
         String[] opciones = new String[deps.size()];
-        for (int i = 0; i < deps.size(); i++) opciones[i] = deps.get(i).getNombre();
+        for (int i = 0; i < deps.size(); i++) {
+            opciones[i] = deps.get(i).getNombre();
+        }
 
         return (String) JOptionPane.showInputDialog(null,
                 "Seleccione una dependencia:", "Seleccionar Dependencia",

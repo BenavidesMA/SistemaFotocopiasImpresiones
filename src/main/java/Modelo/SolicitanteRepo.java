@@ -24,12 +24,6 @@ public class SolicitanteRepo {
         this.solicitantes = new ArrayList<>();
     }
 
-    /**
-     * Agrega un solicitante al repositorio si no existe ya. POLIMORFISMO: puede
-     * recibir un Solicitante o un OperarioPublicaciones.
-     *
-     * @return true si se agregó, false si ya existía o no es válido.
-     */
     public boolean agregar(Solicitante s) {
         if (s == null || !s.esValido()) {
             return false;
@@ -40,12 +34,6 @@ public class SolicitanteRepo {
         return solicitantes.add(s);
     }
 
-    /**
-     * Busca un solicitante por su extensión (PK). POLIMORFISMO: puede retornar
-     * un Solicitante o un OperarioPublicaciones.
-     *
-     * @return el Solicitante encontrado, o null si no existe.
-     */
     public Solicitante buscarPorExtensionBD(String extension) {
         if (extension == null) {
             return null;
@@ -75,7 +63,6 @@ public class SolicitanteRepo {
         return null;
     }
 
-// Busca operarios en la lista local (solo OperarioPublicaciones)
     public Solicitante buscarOperarioPorExtension(String extension) {
         if (extension == null) {
             return null;
@@ -94,42 +81,23 @@ public class SolicitanteRepo {
                 || buscarOperarioPorExtension(extension) != null;
     }
 
-    /**
-     * Autentica un usuario por extensión y contraseña. POLIMORFISMO: retorna un
-     * Solicitante que puede ser en realidad un OperarioPublicaciones. El
-     * llamador puede verificar getTipoUsuario() para saber el rol real.
-     *
-     * @param extension extensión telefónica (usuario).
-     * @param password contraseña.
-     * @return el Solicitante autenticado, o null si las credenciales son
-     * incorrectas.
-     */
     public Solicitante autenticar(String extension) {
         if (extension == null) {
             return null;
         }
 
-        // 1. Buscar primero en la BD (solicitantes normales)
         Solicitante s = buscarPorExtensionBD(extension);
         if (s != null) {
             return s;
         }
 
-        // 2. Si no está en BD, buscar en lista local (solo operarios)
         return buscarOperarioPorExtension(extension);
     }
 
-    /**
-     * Retorna todos los solicitantes registrados. POLIMORFISMO: la lista
-     * contiene objetos Solicitante y OperarioPublicaciones.
-     */
     public List<Solicitante> listarTodos() {
         return new ArrayList<>(solicitantes);
     }
 
-    /**
-     * Retorna la cantidad de solicitantes registrados.
-     */
     public int cantidad() {
         return solicitantes.size();
     }
@@ -239,29 +207,29 @@ public class SolicitanteRepo {
     }
 
     public Solicitante dbConsultarPorNombre(String nombre, String apellido) {
-    String sql = "SELECT nombre, apellido, extension, cargo, nombre_dependencia "
-               + "FROM solicitantes WHERE nombre = ? AND apellido = ?";
-    try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql)) {
-        ps.setString(1, nombre.trim());
-        ps.setString(2, apellido.trim());
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            Solicitante s = new Solicitante(
-                rs.getString("nombre"),
-                rs.getString("apellido"),
-                rs.getString("extension"),
-                rs.getString("cargo"),
-                rs.getString("nombre_dependencia")
-            );
+        String sql = "SELECT nombre, apellido, extension, cargo, nombre_dependencia "
+                + "FROM solicitantes WHERE nombre = ? AND apellido = ?";
+        try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql)) {
+            ps.setString(1, nombre.trim());
+            ps.setString(2, apellido.trim());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Solicitante s = new Solicitante(
+                        rs.getString("nombre"),
+                        rs.getString("apellido"),
+                        rs.getString("extension"),
+                        rs.getString("cargo"),
+                        rs.getString("nombre_dependencia")
+                );
+                rs.close();
+                return s;
+            }
             rs.close();
-            return s;
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,
+                    "Error al consultar solicitante:\n" + e.getMessage(),
+                    "Error SQL", JOptionPane.ERROR_MESSAGE);
         }
-        rs.close();
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null,
-            "Error al consultar solicitante:\n" + e.getMessage(),
-            "Error SQL", JOptionPane.ERROR_MESSAGE);
+        return null;
     }
-    return null;
-}
 }

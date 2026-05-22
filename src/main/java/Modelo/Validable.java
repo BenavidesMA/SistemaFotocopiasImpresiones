@@ -9,6 +9,8 @@ package Modelo;
  * @author Miguel
  */
 public interface Validable {
+
     boolean esValido();
+
     String getMensajeValidacion();
 }

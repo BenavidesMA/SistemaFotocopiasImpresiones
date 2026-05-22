@@ -11,20 +11,19 @@ package Modelo;
 public enum TipoUsuario {
     SOLICITANTE("Solicitante"),
     OPERARIO_PUBLICACIONES("Operario de Publicaciones");
- 
+
     private final String descripcion;
- 
+
     TipoUsuario(String descripcion) {
         this.descripcion = descripcion;
     }
- 
+
     public String getDescripcion() {
         return descripcion;
     }
- 
+
     @Override
     public String toString() {
         return descripcion;
     }
 }
- 

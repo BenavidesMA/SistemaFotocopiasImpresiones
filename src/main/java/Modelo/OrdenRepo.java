@@ -28,11 +28,6 @@ public class OrdenRepo {
         this.siguienteNumOrden = 1;
     }
 
-    /**
-     * Agrega una orden al repositorio si no existe ya.
-     *
-     * @return true si se agregó, false si ya existía o no es válida.
-     */
     public boolean agregar(OrdenAutorizacion orden) {
         if (orden == null || !orden.esValido()) {
             return false;
@@ -42,7 +37,6 @@ public class OrdenRepo {
         }
         ordenes.put(orden.getNumOrden(), orden);
 
-        // Actualiza el contador para el siguiente número de orden
         if (orden.getNumOrden() >= siguienteNumOrden) {
             siguienteNumOrden = orden.getNumOrden() + 1;
         }
@@ -50,29 +44,14 @@ public class OrdenRepo {
         return true;
     }
 
-    /**
-     * Busca una orden por su número (PK).
-     *
-     * @return la OrdenAutorizacion encontrada, o null si no existe.
-     */
     public OrdenAutorizacion buscarPorNumero(int numOrden) {
         return ordenes.get(numOrden);
     }
 
-    /**
-     * Verifica si existe una orden con ese número.
-     */
     public boolean existe(int numOrden) {
         return ordenes.containsKey(numOrden);
     }
 
-    /**
-     * Busca todas las órdenes de un solicitante específico.
-     *
-     * @param nombreSolicitante nombre del solicitante.
-     * @param apellidoSolicitante apellido del solicitante.
-     * @return lista de órdenes del solicitante (vacía si no tiene ninguna).
-     */
     public List<OrdenAutorizacion> buscarPorSolicitante(String nombreSolicitante,
             String apellidoSolicitante) {
         List<OrdenAutorizacion> resultado = new ArrayList<>();
@@ -89,25 +68,14 @@ public class OrdenRepo {
         return resultado;
     }
 
-    /**
-     * Retorna todas las órdenes registradas.
-     */
     public List<OrdenAutorizacion> listarTodas() {
         return new ArrayList<>(ordenes.values());
     }
 
-    /**
-     * Genera el siguiente número de orden disponible.
-     *
-     * @return número de orden único.
-     */
     public int generarNumeroOrden() {
         return siguienteNumOrden++;
     }
 
-    /**
-     * Retorna la cantidad de órdenes registradas.
-     */
     public int cantidad() {
         return ordenes.size();
     }
@@ -309,13 +277,13 @@ public class OrdenRepo {
         String sql = "INSERT INTO servicios (num_orden, servicio_seleccionado) VALUES (?, ?)";
 
         try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql)) {
-            // Recorre cada servicio que el usuario seleccionó y lo inserta
+
             for (Servicio s : o.getServicios()) {
                 ps.setInt(1, o.getNumOrden());
                 ps.setString(2, s.getServicioSeleccionado().name());
-                ps.addBatch(); // agrupa todos los INSERT en una sola operación
+                ps.addBatch();
             }
-            ps.executeBatch(); // ejecuta todos de una vez
+            ps.executeBatch();
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,
@@ -323,35 +291,32 @@ public class OrdenRepo {
                     "Error SQL", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     public int dbObtenerSiguienteNumOrden() {
 
-    String sql =
-        "SELECT COALESCE(MAX(num_orden),0)+1 AS siguiente " +
-        "FROM ordenes_autorizacion";
+        String sql
+                = "SELECT COALESCE(MAX(num_orden),0)+1 AS siguiente "
+                + "FROM ordenes_autorizacion";
 
-    try (
-        PreparedStatement ps =
-            BaseDatos.dbConnection.prepareStatement(sql);
+        try (
+                PreparedStatement ps
+                = BaseDatos.dbConnection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
-        ResultSet rs = ps.executeQuery()
-    ) {
+            if (rs.next()) {
+                return rs.getInt("siguiente");
+            }
 
-        if (rs.next()) {
-            return rs.getInt("siguiente");
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Error obteniendo número de orden:\n"
+                    + e.getMessage()
+            );
+
         }
 
-    } catch (SQLException e) {
-
-        JOptionPane.showMessageDialog(
-            null,
-            "Error obteniendo número de orden:\n"
-            + e.getMessage()
-        );
-
+        return 1;
     }
-
-    return 1;
-}
 
 }

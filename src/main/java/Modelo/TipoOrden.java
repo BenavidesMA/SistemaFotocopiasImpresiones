@@ -11,20 +11,19 @@ package Modelo;
 public enum TipoOrden {
     FOTOCOPIAS("Fotocopias"),
     IMPRESIONES("Impresiones");
- 
+
     private final String descripcion;
- 
+
     TipoOrden(String descripcion) {
         this.descripcion = descripcion;
     }
- 
+
     public String getDescripcion() {
         return descripcion;
     }
- 
+
     @Override
     public String toString() {
         return descripcion;
     }
 }
- 

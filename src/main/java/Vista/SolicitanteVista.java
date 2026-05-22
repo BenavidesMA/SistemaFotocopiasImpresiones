@@ -30,9 +30,6 @@ public class SolicitanteVista {
         this.dependenciaVista = new DependenciaVista(dependenciaRepo);
     }
 
-    /**
-     * Menú de gestión de solicitantes.
-     */
     public void gestionarSolicitantes() {
         int opcion;
         do {
@@ -42,7 +39,7 @@ public class SolicitanteVista {
                     + "1. Registrar Nuevo Solicitante\n"
                     + "2. Listar Solicitantes (datos básicos)\n"
                     + "3. Listar Solicitantes (con dependencia)\n"
-                    + "4. Consultar Solicitante por Nombre\n" // NUEVA
+                    + "4. Consultar Solicitante por Nombre\n"
                     + "5. Volver al Menú Principal\n\n"
                     + "Elija una opción:",
                     "Solicitantes - UAO", JOptionPane.QUESTION_MESSAGE
@@ -66,7 +63,7 @@ public class SolicitanteVista {
                     break;
                 case 3:
                     listarSolicitantesCompleto();
-                    break;  // NUEVA
+                    break;
                 case 4:
                     consultarSolicitantePorNombre();
                     break;
@@ -80,7 +77,6 @@ public class SolicitanteVista {
         } while (opcion != 5);
     }
 
-// MÉTODO NUEVO — equivalente a SELECT con INNER JOIN sobre dependencia
     private void listarSolicitantesCompleto() {
         ArrayList<String> sols = solicitanteRepo.dbConsultarConDependencia();
 
@@ -94,11 +90,8 @@ public class SolicitanteVista {
 
     }
 
-    /**
-     * Registra un nuevo solicitante (usuario del sistema).
-     */
     private void registrarSolicitante() {
-        // 1. Solicitar nombre
+
         String nombre = JOptionPane.showInputDialog(
                 null,
                 "═══ REGISTRAR SOLICITANTE ═══\n\n"
@@ -115,7 +108,6 @@ public class SolicitanteVista {
             return;
         }
 
-        // 2. Solicitar apellido
         String apellido = JOptionPane.showInputDialog(
                 null,
                 "Nombre: " + nombre + "\n\n"
@@ -132,7 +124,6 @@ public class SolicitanteVista {
             return;
         }
 
-        // 3. Solicitar extensión (username único)
         String extension = JOptionPane.showInputDialog(
                 null,
                 "Nombre: " + nombre + " " + apellido + "\n\n"
@@ -150,13 +141,11 @@ public class SolicitanteVista {
             return;
         }
 
-        // Verificar si ya existe
         if (solicitanteRepo.existe(extension.trim())) {
             mostrarError("Ya existe un solicitante con esa extensión.");
             return;
         }
 
-        // 4. Solicitar cargo
         String cargo = JOptionPane.showInputDialog(
                 null,
                 "Nombre: " + nombre + " " + apellido + "\n"
@@ -174,13 +163,11 @@ public class SolicitanteVista {
             return;
         }
 
-        // 5. Seleccionar dependencia
         String nombreDependencia = dependenciaVista.seleccionarDependencia();
         if (nombreDependencia == null) {
             return;
         }
 
-        // Crear y validar
         Solicitante sol = new Solicitante(
                 nombre.trim(),
                 apellido.trim(),
@@ -199,7 +186,6 @@ public class SolicitanteVista {
             return;
         }
 
-        // Agregar
         if (solicitanteRepo.dbRegistrar(sol)) {
             JOptionPane.showMessageDialog(
                     null,
@@ -215,9 +201,6 @@ public class SolicitanteVista {
         }
     }
 
-    /**
-     * Lista todos los solicitantes registrados.
-     */
     private void listarSolicitantes() {
         List<Solicitante> sols = solicitanteRepo.dbConsultarBasicosTodos();
 
@@ -272,7 +255,7 @@ public class SolicitanteVista {
         }
 
         String info
-                = "Nombre:      " + s.getNombre() + "\n" 
+                = "Nombre:      " + s.getNombre() + "\n"
                 + "Apellido:    " + s.getApellido() + "\n"
                 + "Extensión:   " + s.getExtension() + "\n"
                 + "Cargo:       " + s.getCargo() + "\n"
@@ -282,9 +265,6 @@ public class SolicitanteVista {
                 "Datos del Solicitante", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    /**
-     * Muestra un mensaje de error.
-     */
     private void mostrarError(String mensaje) {
         JOptionPane.showMessageDialog(
                 null,

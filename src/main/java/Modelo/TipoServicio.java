@@ -33,23 +33,22 @@ public enum TipoServicio {
     QUEMA_CD("22 - Quema de CD"),
     SCANNER("23 - Scanner"),
     PASAR_ARCHIVO_PDF("24 - Pasar Archivo PDF");
- 
+
     private final String descripcion;
- 
+
     TipoServicio(String descripcion) {
         this.descripcion = descripcion;
     }
- 
+
     public String getDescripcion() {
         return descripcion;
     }
- 
+
     @Override
     public String toString() {
         return descripcion;
     }
- 
-    /** Retorna el TipoServicio correspondiente a un número (1-24). Retorna null si no es válido. */
+
     public static TipoServicio porNumero(int numero) {
         TipoServicio[] valores = TipoServicio.values();
         if (numero >= 1 && numero <= valores.length) {
@@ -57,8 +56,7 @@ public enum TipoServicio {
         }
         return null;
     }
- 
-    /** Genera un String numerado con todos los servicios para mostrarlo en JOptionPane. */
+
     public static String listarServicios() {
         StringBuilder sb = new StringBuilder("=== SERVICIOS DISPONIBLES ===\n");
         for (int i = 0; i < values().length; i++) {
@@ -67,4 +65,3 @@ public enum TipoServicio {
         return sb.toString();
     }
 }
- 

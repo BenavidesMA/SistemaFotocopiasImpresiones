@@ -16,18 +16,14 @@ import javax.swing.JOptionPane;
  *
  * @author Miguel
  */
-public class DependenciaRepo{
- 
+public class DependenciaRepo {
+
     private List<Dependencia> dependencias;
- 
+
     public DependenciaRepo() {
         this.dependencias = new ArrayList<>();
     }
- 
-    /**
-     * Agrega una dependencia al repositorio si no existe ya.
-     * @return true si se agregó, false si ya existía.
-     */
+
     public boolean agregar(Dependencia d) {
         if (d == null || !d.esValido()) {
             return false;
@@ -37,13 +33,11 @@ public class DependenciaRepo{
         }
         return dependencias.add(d);
     }
- 
-    /**
-     * Busca una dependencia por su nombre (PK).
-     * @return la Dependencia encontrada, o null si no existe.
-     */
+
     public Dependencia buscarPorNombre(String nombre) {
-        if (nombre == null) return null;
+        if (nombre == null) {
+            return null;
+        }
         for (Dependencia d : dependencias) {
             if (d.getNombre().equalsIgnoreCase(nombre.trim())) {
                 return d;
@@ -51,40 +45,34 @@ public class DependenciaRepo{
         }
         return null;
     }
- 
-    /**
-     * Verifica si existe una dependencia con ese nombre.
-     */
+
     public boolean existe(String nombre) {
         return buscarPorNombre(nombre) != null;
     }
- 
-    /**
-     * Retorna todas las dependencias registradas.
-     */
+
     public List<Dependencia> listarTodas() {
         return new ArrayList<>(dependencias);
     }
-    
+
     public boolean eliminar(String nombre) {
-    for (Dependencia d : dependencias) {
-        if (d.getNombre().equalsIgnoreCase(nombre)) {
-            dependencias.remove(d);
-            return true;
+        for (Dependencia d : dependencias) {
+            if (d.getNombre().equalsIgnoreCase(nombre)) {
+                dependencias.remove(d);
+                return true;
+            }
         }
+        return false;
     }
-    return false;
-}
 
     public int cantidad() {
         return dependencias.size();
     }
-    
+
     public boolean dbRegistrar(Dependencia d) {
         if (d == null || !d.esValido()) {
             JOptionPane.showMessageDialog(null,
-                "Datos inválidos:\n" + (d != null ? d.getMensajeValidacion() : "Objeto nulo"),
-                "Error de validación", JOptionPane.ERROR_MESSAGE);
+                    "Datos inválidos:\n" + (d != null ? d.getMensajeValidacion() : "Objeto nulo"),
+                    "Error de validación", JOptionPane.ERROR_MESSAGE);
             return false;
         }
         String sql = "INSERT INTO dependencias (nombre, centro_costo) VALUES (?, ?)";
@@ -93,13 +81,13 @@ public class DependenciaRepo{
             ps.setString(2, d.getCentroCosto());
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null,
-                "Dependencia '" + d.getNombre() + "' registrada exitosamente.",
-                "Registro exitoso", JOptionPane.INFORMATION_MESSAGE);
+                    "Dependencia '" + d.getNombre() + "' registrada exitosamente.",
+                    "Registro exitoso", JOptionPane.INFORMATION_MESSAGE);
             return true;
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,
-                "Error al registrar dependencia:\n" + e.getMessage(),
-                "Error SQL", JOptionPane.ERROR_MESSAGE);
+                    "Error al registrar dependencia:\n" + e.getMessage(),
+                    "Error SQL", JOptionPane.ERROR_MESSAGE);
             return false;
         }
     }
@@ -107,32 +95,33 @@ public class DependenciaRepo{
     public ArrayList<Dependencia> dbConsultarTodas() {
         ArrayList<Dependencia> lista = new ArrayList<>();
         String sql = "SELECT * FROM dependencias";
-        try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 lista.add(new Dependencia(
-                    rs.getString("nombre"),
-                    rs.getString("centro_costo")
+                        rs.getString("nombre"),
+                        rs.getString("centro_costo")
                 ));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,
-                "Error al consultar dependencias:\n" + e.getMessage(),
-                "Error SQL", JOptionPane.ERROR_MESSAGE);
+                    "Error al consultar dependencias:\n" + e.getMessage(),
+                    "Error SQL", JOptionPane.ERROR_MESSAGE);
         }
         return lista;
     }
 
     public Dependencia dbConsultarPorNombre(String nombre) {
-        if (nombre == null || nombre.trim().isEmpty()) return null;
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return null;
+        }
         String sql = "SELECT * FROM dependencias WHERE nombre = ?";
         try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql)) {
             ps.setString(1, nombre.trim());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 Dependencia dep = new Dependencia(
-                    rs.getString("nombre"),
-                    rs.getString("centro_costo")
+                        rs.getString("nombre"),
+                        rs.getString("centro_costo")
                 );
                 rs.close();
                 return dep;
@@ -140,36 +129,37 @@ public class DependenciaRepo{
             rs.close();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,
-                "Error al buscar dependencia:\n" + e.getMessage(),
-                "Error SQL", JOptionPane.ERROR_MESSAGE);
+                    "Error al buscar dependencia:\n" + e.getMessage(),
+                    "Error SQL", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
 
     public boolean dbEliminar(String nombre) {
-        if (nombre == null || nombre.trim().isEmpty()) return false;
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return false;
+        }
         String sql = "DELETE FROM dependencias WHERE nombre = ?";
         try (PreparedStatement ps = BaseDatos.dbConnection.prepareStatement(sql)) {
             ps.setString(1, nombre.trim());
             int filas = ps.executeUpdate();
             if (filas > 0) {
                 JOptionPane.showMessageDialog(null,
-                    "Dependencia '" + nombre + "' eliminada exitosamente.",
-                    "Eliminación exitosa", JOptionPane.INFORMATION_MESSAGE);
+                        "Dependencia '" + nombre + "' eliminada exitosamente.",
+                        "Eliminación exitosa", JOptionPane.INFORMATION_MESSAGE);
                 return true;
             } else {
                 JOptionPane.showMessageDialog(null,
-                    "No se encontró la dependencia: " + nombre,
-                    "No encontrada", JOptionPane.WARNING_MESSAGE);
+                        "No se encontró la dependencia: " + nombre,
+                        "No encontrada", JOptionPane.WARNING_MESSAGE);
                 return false;
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,
-                "Error al eliminar dependencia:\n" + e.getMessage(),
-                "Error SQL", JOptionPane.ERROR_MESSAGE);
+                    "Error al eliminar dependencia:\n" + e.getMessage(),
+                    "Error SQL", JOptionPane.ERROR_MESSAGE);
             return false;
         }
     }
 
-} 
-
+}

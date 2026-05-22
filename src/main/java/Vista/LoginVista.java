@@ -20,20 +20,12 @@ public class LoginVista {
     public LoginVista(SolicitanteRepo solicitanteRepo) {
         this.solicitanteRepo = solicitanteRepo;
     }
-       
-       
-    /**
-     * Muestra selector de tipo de usuario y luego autentica.
-     *
-     * @return el Solicitante autenticado, o null si canceló o excedió los
-     * intentos.
-     */
+
     public Solicitante mostrarLogin() {
 
-        // ── PASO 0: Selección de tipo de usuario ──────────────────────────────
         String tipoInput = JOptionPane.showInputDialog(
                 null,
-                  "╔═══════════════════════════════════════╗\n"
+                "╔═══════════════════════════════════════╗\n"
                 + "║  SISTEMA DE FOTOCOPIAS E IMPRESIONES ║\n"
                 + "║   Universidad Autónoma de Occidente               ║\n"
                 + "╚═══════════════════════════════════════╝\n\n"
@@ -59,7 +51,7 @@ public class LoginVista {
                 esOperario = true;
                 break;
             case "3":
-                return null;  // el main interpreta null como cierre
+                return null;
             default:
                 JOptionPane.showMessageDialog(null,
                         "Opción inválida.",
@@ -67,7 +59,6 @@ public class LoginVista {
                 return null;
         }
 
-        // ── PASO 1: Login ─────────────────────────────────────────────────────
         int intentos = 0;
         final int MAX_INTENTOS = 3;
 
@@ -95,7 +86,7 @@ public class LoginVista {
             Solicitante usuario = solicitanteRepo.autenticar(extension.trim());
 
             if (usuario != null) {
-                // Verificar que el tipo coincida con la opción elegida
+
                 boolean usuarioEsOperario
                         = usuario.getTipoUsuario() == TipoUsuario.OPERARIO_PUBLICACIONES;
 
