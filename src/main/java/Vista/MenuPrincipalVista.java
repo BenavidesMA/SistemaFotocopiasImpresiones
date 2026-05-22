@@ -67,26 +67,24 @@ public class MenuPrincipalVista {
                 null,
                 encabezado()
               + "1. Crear Nueva Orden\n"
-              + "2. Consultar Órdenes\n"
-              + "3. Salir\n"
+              + "2. Salir\n"
               + separador()
               + "Elija una opción:",
                 "Menú Principal - UAO",
                 JOptionPane.QUESTION_MESSAGE
             );
 
-            if (input == null) { opcion = 3; continue; }
+            if (input == null) { opcion = 2; continue; }
 
             try { opcion = Integer.parseInt(input.trim()); }
             catch (NumberFormatException e) { opcion = -1; }
 
             switch (opcion) {
                 case 1: ordenVista.crearOrden(usuarioActual);          break;
-                case 2: consultaVista.consultarOrdenes(usuarioActual); break;
-                case 3: despedida();                                    break;
+                case 2: despedida();                                    break;
                 default: mostrarError("Opción inválida.");              break;
             }
-        } while (opcion != 3);
+        } while (opcion != 2);
     }
 
     // ══════════════════════════════════════════════════════════════════════

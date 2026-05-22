@@ -80,7 +80,7 @@ public class OrdenAutorizacionVista {
      */
     private OrdenAutorizacion crearDatosBasicos(Solicitante usuarioActual) {
         // Generar número de orden automático
-        int numOrden = ordenRepo.generarNumeroOrden();
+        int numOrden = ordenRepo.dbObtenerSiguienteNumOrden();
  
         JOptionPane.showMessageDialog(
             null,
