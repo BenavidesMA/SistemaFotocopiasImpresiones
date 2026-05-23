@@ -25,7 +25,7 @@ public class BaseDatos {
 
         nameDB = "esquema_db_act";
         user = "root";
-        pwd = "benavides2302";
+        pwd = "root";
 
         try {
 
