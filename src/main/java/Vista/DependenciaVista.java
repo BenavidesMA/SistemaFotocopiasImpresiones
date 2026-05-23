@@ -30,9 +30,8 @@ public class DependenciaVista {
                     + "1. Registrar Nueva Dependencia\n"
                     + "2. Listar Todas las Dependencias\n"
                     + "3. Buscar Dependencia por Nombre\n"
-                    + "4. Modificar Dependencia\n"
-                    + "5. Eliminar Dependencia\n"
-                    + "6. Volver al Menú Principal\n\n"
+                    + "4. Eliminar Dependencia\n"
+                    + "5. Volver al Menú Principal\n\n"
                     + "Elija una opción:",
                     "Dependencias - UAO", JOptionPane.QUESTION_MESSAGE
             );
@@ -40,6 +39,7 @@ public class DependenciaVista {
             if (input == null) {
                 return;
             }
+
             try {
                 opcion = Integer.parseInt(input.trim());
             } catch (NumberFormatException e) {
@@ -57,18 +57,16 @@ public class DependenciaVista {
                     buscarDependencia();
                     break;
                 case 4:
-                    modificarDependencia();
-                    break;
-                case 5:
                     eliminarDependencia();
                     break;
-                case 6:
+                case 5:
                     break;
                 default:
                     error("Opción inválida.");
                     break;
             }
-        } while (opcion != 6);
+
+        } while (opcion != 5);
     }
 
     private void buscarDependencia() {
@@ -136,55 +134,6 @@ public class DependenciaVista {
         } else {
             error("No se pudo registrar la dependencia.");
         }
-    }
-
-    private void modificarDependencia() {
-        List<Dependencia> deps = dependenciaRepo.listarTodas();
-        if (deps.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No hay dependencias registradas.",
-                    "Modificar Dependencia", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        String[] opciones = new String[deps.size()];
-        for (int i = 0; i < deps.size(); i++) {
-            opciones[i] = deps.get(i).getNombre();
-        }
-
-        String seleccion = (String) JOptionPane.showInputDialog(null,
-                "Seleccione la dependencia a modificar:",
-                "Modificar Dependencia", JOptionPane.QUESTION_MESSAGE,
-                null, opciones, opciones[0]);
-
-        if (seleccion == null) {
-            return;
-        }
-
-        String nuevoCentro = JOptionPane.showInputDialog(null,
-                "Dependencia: " + seleccion + "\n\n"
-                + "Ingrese el nuevo centro de costo (3-12 caracteres):",
-                "Modificar Dependencia", JOptionPane.QUESTION_MESSAGE);
-
-        if (nuevoCentro == null) {
-            return;
-        }
-        if (nuevoCentro.trim().isEmpty()) {
-            error("El centro de costo no puede estar vacío.");
-            return;
-        }
-
-        Dependencia temp = new Dependencia(seleccion, nuevoCentro.trim());
-        if (!temp.esValido()) {
-            error("Datos inválidos:\n\n" + temp.getMensajeValidacion());
-            return;
-        }
-
-        Dependencia dep = dependenciaRepo.dbConsultarPorNombre(seleccion);
-        dep.setCentroCosto(nuevoCentro.trim());
-
-        JOptionPane.showMessageDialog(null,
-                "✓ Dependencia actualizada exitosamente.\n\n" + dep.toString(),
-                "Modificación Exitosa", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void eliminarDependencia() {

@@ -269,9 +269,10 @@ public class OrdenRepo {
         return lista;
     }
 
-    public void dbRegistrarServicios(OrdenAutorizacion o) {
+    public boolean dbRegistrarServicios(OrdenAutorizacion o) {
+
         if (o == null || o.getServicios().isEmpty()) {
-            return;
+            return false;
         }
 
         String sql = "INSERT INTO servicios (num_orden, servicio_seleccionado) VALUES (?, ?)";
@@ -283,12 +284,20 @@ public class OrdenRepo {
                 ps.setString(2, s.getServicioSeleccionado().name());
                 ps.addBatch();
             }
+
             ps.executeBatch();
+            return true;
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null,
+
+            JOptionPane.showMessageDialog(
+                    null,
                     "Error al registrar servicios:\n" + e.getMessage(),
-                    "Error SQL", JOptionPane.ERROR_MESSAGE);
+                    "Error SQL",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return false;
         }
     }
 

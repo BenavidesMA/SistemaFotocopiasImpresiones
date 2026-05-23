@@ -59,8 +59,8 @@ public class LiquidacionFinal extends Liquidacion implements Validable {
             errores.append("- Hora debe tener formato HH:MM (ej: 14:30).\n");
         }
 
-        if (fechaElaboracion == null || !fechaElaboracion.matches("\\d{2}-\\d{2}-\\d{4}")) {
-            errores.append("- Fecha elaboración debe tener formato dd-mm-aaaa (ej: 10-05-2026).\n");
+        if (fechaElaboracion == null || !fechaElaboracion.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            errores.append("- Fecha elaboración debe tener formato dd-mm-aaaa (ej: 2026-02-23).\n");
         }
 
         return errores.toString();

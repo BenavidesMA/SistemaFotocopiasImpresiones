@@ -24,16 +24,6 @@ public class DependenciaRepo {
         this.dependencias = new ArrayList<>();
     }
 
-    public boolean agregar(Dependencia d) {
-        if (d == null || !d.esValido()) {
-            return false;
-        }
-        if (existe(d.getNombre())) {
-            return false;
-        }
-        return dependencias.add(d);
-    }
-
     public Dependencia buscarPorNombre(String nombre) {
         if (nombre == null) {
             return null;
@@ -48,20 +38,6 @@ public class DependenciaRepo {
 
     public boolean existe(String nombre) {
         return buscarPorNombre(nombre) != null;
-    }
-
-    public List<Dependencia> listarTodas() {
-        return new ArrayList<>(dependencias);
-    }
-
-    public boolean eliminar(String nombre) {
-        for (Dependencia d : dependencias) {
-            if (d.getNombre().equalsIgnoreCase(nombre)) {
-                dependencias.remove(d);
-                return true;
-            }
-        }
-        return false;
     }
 
     public int cantidad() {
